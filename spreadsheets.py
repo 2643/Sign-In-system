@@ -1,6 +1,6 @@
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-from jupyter_client.kernelspecapp import raw_input
+#from jupyter_client.kernelspecapp import raw_input
 import time
 
 class spreadsheet:

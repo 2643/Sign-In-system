@@ -22,6 +22,7 @@ class improvedGUI():
         self.thread2 = None
         self.stopEvent = None
         self.stopEvent2 = None
+        self.gFrame = None
         #self.useGui = gui()
 
         self.top = tki.Tk()
@@ -43,7 +44,6 @@ class improvedGUI():
         self.s = spreadsheet()
 
         self.stopEvent= threading.Event()
-        self.stopEvent2 = threading.Event()
         self.thread = threading.Thread(target = self.videoLoop, args=())
         self.thread.start()
 
@@ -54,8 +54,8 @@ class improvedGUI():
         try:
             while not self.stopEvent.is_set():
                 ret, self.frame = self.vs.read()
-                self.frame = imutils.resize(self.frame, width = 400)
-                
+                self.frame = imutils.resize(self.frame, width = 750)
+
                 image = cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGB)
                 image = Image.fromarray(image)
                 image = ImageTk.PhotoImage(image)
@@ -72,7 +72,8 @@ class improvedGUI():
                     self.button3.pack()
                     self.message.pack()
                 else:
-                    cv2.waitKey(10)
+                    #print("updating video output")
+                    #cv2.waitKey()
                     self.panel.configure(image=image)
                     self.panel.image = image
                     
@@ -109,36 +110,50 @@ class improvedGUI():
     
     def checkVidT(self):
         print("Thread begins: ")
+        self.stopEvent2 = threading.Event()
         self.thread2 = threading.Thread(target = self.video, args=())
         self.thread2.start()
     
     def cancelScan(self):
-        self.stopEvent2.set()
-        self.var.set("")
-        self.message.pack()
+        if not self.stopEvent2.is_set():
+            self.stopEvent2.set()
+            time.sleep(0.01)
+            self.var.set("")
+            self.message.pack()
         
     def video(self):
         while self.results == "" and not self.stopEvent2.is_set():
-            #print(self.stopEvent2)
+            
             self.var.set("Scanning for ID")
             self.message.pack()
             image = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
+            
             self.results = str(self.read.findImage(image))
             self.results = self.results[2:len(self.results)-1]
+            #print(self.results)
             if self.results != "":
                 self.var.set("ID found!")
                 self.message.pack()
                 print(self.results)
                 self.getEntry(self.results)
                 self.stopEvent2.set()
+
         self.results = ""
         #self.vid.end()
     
-cap = cv2.VideoCapture(1)
-print(cap.get(3))
-print(cap.get(4))
-ret, image = cap.read()
-g = improvedGUI(cap)
-g.top.mainloop()
+cap = cv2.VideoCapture(0)
+if cap.isOpened():
+    print(cap.get(3))
+    print(cap.get(4))
+    cap.set(3, 1280)
+    cap.set(4, 800)
+    print(cap.get(3))
+    print(cap.get(4))
+    ret, image = cap.read()
+    g = improvedGUI(cap)
+    #g.top.bind('<Enter>', g.on_button())
+    g.top.mainloop()
+else:
+    print("[INFO] camera not working retry")
         
 

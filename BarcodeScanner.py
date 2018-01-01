@@ -35,9 +35,12 @@ class readBarcode():
     def findImage(self, image):
         self.scanner = zbar.Scanner()
         results = self.scanner.scan(image)
+        print(results)
+        #cv2.imshow('image', image)
+        #cv2.waitKey(1)
         id = ""
         for result in results:
-            #print(result.type, result.data, result.quality, result.position)
+            print(result.type, result.data, result.quality, result.position)
             id = result.data
             
         return id
