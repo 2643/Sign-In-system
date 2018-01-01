@@ -66,7 +66,7 @@ class spreadsheet:
         val = self.isheet.cell(row, col).value
         if val != "":
             self.osheet.update_cell(row, col, self.getTime())
-            self.addTotalTime(row)
+            #self.addTotalTime(row)
             return "Good bye "  
         else:
             self.isheet.update_cell(row, col, self.getTime())

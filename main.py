@@ -8,6 +8,7 @@ import imutils
 import cv2
 import os
 import time
+import sys
 from BarcodeScanner import barcodeVid
 from BarcodeScanner import readBarcode
 from spreadsheets import spreadsheet
@@ -42,6 +43,7 @@ class improvedGUI():
         self.s = spreadsheet()
 
         self.stopEvent= threading.Event()
+        self.stopEvent2 = threading.Event()
         self.thread = threading.Thread(target = self.videoLoop, args=())
         self.thread.start()
 
@@ -70,21 +72,26 @@ class improvedGUI():
                     self.button3.pack()
                     self.message.pack()
                 else:
-                    cv2.waitKey()
+                    cv2.waitKey(10)
                     self.panel.configure(image=image)
                     self.panel.image = image
                     
         except RuntimeError as e:
             print("[INFO] caught a RuntimeError")
+            quit()
 
     def onClose(self):
         # set the stop event, cleanup the camera, and allow the rest of
         # the quit process to continue
         print("[INFO] closing...")
         self.stopEvent.set()
+        if self.stopEvent2 != None:
+            self.stopEvent2.set()
+        quit()
+        sys.exit()
+        self.top.quit()
         self.vs.release()
         cv2.destroyAllWindows()
-        self.top.quit()
         
     def getEntry(self, id):
         self.firstN, self.LastN, val = self.s.askForPerson(id)
@@ -102,7 +109,6 @@ class improvedGUI():
     
     def checkVidT(self):
         print("Thread begins: ")
-        self.stopEvent2 = threading.Event()
         self.thread2 = threading.Thread(target = self.video, args=())
         self.thread2.start()
     
@@ -127,8 +133,10 @@ class improvedGUI():
                 self.stopEvent2.set()
         self.results = ""
         #self.vid.end()
-        
+    
 cap = cv2.VideoCapture(1)
+print(cap.get(3))
+print(cap.get(4))
 ret, image = cap.read()
 g = improvedGUI(cap)
 g.top.mainloop()
