@@ -1,7 +1,6 @@
 '''
 Created on Dec 30, 2017
-
-@author: adleywong
+Depreciated all code moved to main.py
 '''
 import tkinter as tk
 from spreadsheets import spreadsheet
