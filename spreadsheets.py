@@ -39,28 +39,29 @@ class spreadsheet:
         listC = len(self.isheet.row_values(1))
         val = 0
         totalH = datetime.strptime('00:00:00', '%H:%M:%S').time()
-        #print(totalH)
-        inVal = self.isheet.cell(row, col).value
-        outVal = self.osheet.cell(row, col).value
+        #print("[INFO] " + str(col))
+ 
         addVal = self.asheet.cell(row, 5).value
-        if addVal != "":
-            totalH = datetime.strptime(addVal, '%H:%M:%S').time()
-            #print(totalH)
-            
-        if inVal != "" and outVal != "":
+        returnVal = None
+
+        for c in range(5, col+1):
+            #print("[INFO] " + str(c))
+            inVal = self.isheet.cell(row, c).value
+            outVal = self.osheet.cell(row, c).value
+
             enterT = datetime.strptime(inVal, '%H:%M:%S').time()
             exitT = datetime.strptime(outVal, '%H:%M:%S').time()
-            #print(enterT)
-            #print(exitT)
+            #print("[INFO] Enter: " + str(enterT) + "     [INFO] Exit: " + str(exitT))
+            
             dif = datetime.combine(datetime.today(), exitT) - datetime.combine(datetime.today(), enterT)
-            #print(dif)
-            #dif = datetime.strptime(dif, '%H:%M:%S').time()
-            totalH = datetime.combine(datetime.today(), totalH) + dif
+            #print("[INFO] " + str(dif))
+            if c != 5:
+                totalH = totalH + dif
+            else:
+                totalH = datetime.combine(datetime.today(), totalH) + dif
             returnVal = str(totalH.hour) + ":" + str(totalH.minute) + ":" + str(totalH.second)
-            #print(returnVal)
-            self.asheet.update_cell(row, 5, returnVal)
-        else:
-            totalH = 0
+        #print("[INFO] " + returnVal)
+        self.asheet.update_cell(row, 5, returnVal)
     
     # ##adds time stamp to sign in/out
     def addTimeStamp(self, row, col):
