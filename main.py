@@ -41,14 +41,17 @@ class improvedGUI():
         self.vid = barcodeVid()
         self.read = readBarcode()
         self.results = ""
-        self.s = spreadsheet()
+        self.s = spreadsheet("test")
 
         self.stopEvent= threading.Event()
         self.thread = threading.Thread(target = self.videoLoop, args=())
         self.thread.start()
 
-        self.top.wm_title("PyImageSearch test")
+        self.top.wm_title("Py SignIn System")
         self.top.wm_protocol("WM_DELETE_WINDOW", self.onClose)
+
+    def pressed(self, test):
+        self.on_button()
     
     def videoLoop(self):
         try:
@@ -61,6 +64,8 @@ class improvedGUI():
                 image = ImageTk.PhotoImage(image)
                 
                 if self.panel is None:
+                    self.bind = self.top.bind('<Return>', self.pressed)
+                    self.bind2 = self.top.bind('<KP_Enter>', self.pressed)
                     self.panel = tki.Label(image=image)
                     self.panel.image = image
                     self.panel.pack(side="left", padx=10, pady=10)
@@ -105,11 +110,12 @@ class improvedGUI():
             self.message.pack()
         
     def on_button(self):
+        print("[INFO] running")
         id = self.entry.get()
         self.getEntry(id)
     
     def checkVidT(self):
-        print("Thread begins: ")
+        print("[INFO] Thread begins: ")
         self.stopEvent2 = threading.Event()
         self.thread2 = threading.Thread(target = self.video, args=())
         self.thread2.start()
@@ -134,21 +140,22 @@ class improvedGUI():
             if self.results != "":
                 self.var.set("ID found!")
                 self.message.pack()
-                print(self.results)
+                print("[INFO] Scan Successful")
                 self.getEntry(self.results)
                 self.stopEvent2.set()
 
         self.results = ""
         #self.vid.end()
-    
-cap = cv2.VideoCapture(0)
+
+'''EDIT THIS TO DETERMINE CAMERA'''
+cap = cv2.VideoCapture(1)
 if cap.isOpened():
-    print(cap.get(3))
-    print(cap.get(4))
+    #print(cap.get(3))
+    #print(cap.get(4))
     cap.set(3, 1280)
     cap.set(4, 800)
-    print(cap.get(3))
-    print(cap.get(4))
+    #print(cap.get(3))
+    #print(cap.get(4))
     ret, image = cap.read()
     g = improvedGUI(cap)
     #g.top.bind('<Enter>', g.on_button())

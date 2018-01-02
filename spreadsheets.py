@@ -2,6 +2,7 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 #from jupyter_client.kernelspecapp import raw_input
 import time
+from datetime import *
 
 class spreadsheet:
     
@@ -14,62 +15,64 @@ class spreadsheet:
     # dayFromF = time.localtime()
     # print(dayFromF)
     # print(dayFromF.tm_year)
-    def __init__(self):
+    def __init__(self, spreadSheetName):
         self.scope = ["https://spreadsheets.google.com/feeds"]
         self.creds = ServiceAccountCredentials.from_json_keyfile_name("client_secret.json", self.scope)
 
         self.client = gspread.authorize(self.creds)
-        self.isheet = self.client.open("test").sheet1
-        self.osheet = self.client.open("test").get_worksheet(1)
-        self.asheet = self.client.open("test").get_worksheet(2)
-
+        self.isheet = self.client.open(spreadSheetName).sheet1
+        self.osheet = self.client.open(spreadSheetName).get_worksheet(1)
+        self.asheet = self.client.open(spreadSheetName).get_worksheet(2)
+        self.row = None
+        self.col = None
     
     # ##Finds day of sign in/out
     def findDay(self):
-        day = time.localtime()
-        date = str(day.tm_mon) + "/" + str(day.tm_mday)
+        day = datetime.today()
+        date = str(day.month) + "/" + str(day.day)
         # print(date)
         findDate = self.isheet.find(date)
         # print(findDate.col)
-        return findDate.col
-
-    # ##Gets time when sign in/out
-    def getTime(self):
-        tt = time.localtime()
-        #print(tt)
-        if tt.tm_min < 10:
-            signInTime = str(tt.tm_hour) + "0" + str(tt.tm_min)
-        else:
-            signInTime = str(tt.tm_hour) + str(tt.tm_min)
-            print(signInTime)
-        return signInTime
+        self.col = findDate.col
     
-    def addTotalTime(self, row):
+    def addTotalTime(self, row, col):
         listC = len(self.isheet.row_values(1))
         val = 0
-        totalH = 0
-        if self.asheet.cell(row, 5).value != "":
-            totalH = int(self.asheet.cell(row, 5).value)
-        
-        for y in range (5, listC):
-            if self.isheet.cell(row, y).value != "" and self.osheet.cell(row, y).value != "":
-                dif = int(self.osheet.cell(row, y).value) - int(self.isheet.cell(row, y).value)
-                totalH = totalH + dif
-                self.asheet.update_cell(row, 5, totalH)
-            else:
-                totalH = 0
-                break
-        #for x in :
+        totalH = datetime.strptime('00:00:00', '%H:%M:%S').time()
+        #print(totalH)
+        inVal = self.isheet.cell(row, col).value
+        outVal = self.osheet.cell(row, col).value
+        addVal = self.asheet.cell(row, 5).value
+        if addVal != "":
+            totalH = datetime.strptime(addVal, '%H:%M:%S').time()
+            #print(totalH)
+            
+        if inVal != "" and outVal != "":
+            enterT = datetime.strptime(inVal, '%H:%M:%S').time()
+            exitT = datetime.strptime(outVal, '%H:%M:%S').time()
+            #print(enterT)
+            #print(exitT)
+            dif = datetime.combine(datetime.today(), exitT) - datetime.combine(datetime.today(), enterT)
+            #print(dif)
+            #dif = datetime.strptime(dif, '%H:%M:%S').time()
+            totalH = datetime.combine(datetime.today(), totalH) + dif
+            returnVal = str(totalH.hour) + ":" + str(totalH.minute) + ":" + str(totalH.second)
+            #print(returnVal)
+            self.asheet.update_cell(row, 5, returnVal)
+        else:
+            totalH = 0
     
     # ##adds time stamp to sign in/out
     def addTimeStamp(self, row, col):
         val = self.isheet.cell(row, col).value
+        tt = datetime.today()
+        ts = str(tt.hour) + ":" + str(tt.minute) + ":" + str(tt.second)
         if val != "":
-            self.osheet.update_cell(row, col, self.getTime())
-            #self.addTotalTime(row)
+            self.osheet.update_cell(row, col, ts)
+            self.addTotalTime(row, col)
             return "Good bye "  
         else:
-            self.isheet.update_cell(row, col, self.getTime())
+            self.isheet.update_cell(row, col, ts)
             return "Hello "
 
     # ##Finds the person and add data        
@@ -77,14 +80,15 @@ class spreadsheet:
         #idNum = raw_input("Enter Student id ")
         name = "test"
     
-        colInput = self.findDay()
+        self.findDay()
     
         try:
             name = self.isheet.find(idNum)
+            self.row= name.row
         except:
-            print("Error, ID cannot be found")
+            print("[INFO] Error, ID cannot be found")
             return -1, -1, ""
-        state = self.addTimeStamp(name.row, colInput)
-        return self.isheet.cell(name.row, 2), self.isheet.cell(name.row, 1), state
+        state = self.addTimeStamp(self.row, self.col)
+        return self.isheet.cell(self.row, 2), self.isheet.cell(self.row, 1), state
         #time.sleep(.5)
         #self.askForPerson()
