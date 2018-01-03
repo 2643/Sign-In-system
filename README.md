@@ -25,11 +25,6 @@ There are a few necessary modules to run the program
 * numpy `pip install numpy`
 * zbar `pip install zbar-py`
 
-> Also you can install all by just using this
-```
-pip install Pillow numpy gspread imutils opencv-python zbar-py oauth2client
-```
-
 ***
 
 ## Setup
