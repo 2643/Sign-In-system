@@ -1,4 +1,4 @@
-#FRC Team 2643 Sign In System 
+# FRC Team 2643 Sign In System 
 
 This system was built to keep track of hours each member spent during the 2018 Build Season FIRST Robotics competition
 
@@ -7,13 +7,13 @@ The script was made to be used with a raspberry pi using the full desktop versio
 > Written in Python 3.6.2; however, support for Python 2 is unknown
 
 ![](testImage.png)
-##Requirements to running this script
+## Requirements to running this script
 
 You will only need three of the files to run the script `spreadsheets.py` `BarcodeScanner.py` `main.py` 
 
 > I may combine the three scripts into one file
 
-###Furthermore
+### Furthermore
 ***
 There are a few necessary modules to run the program
 
@@ -32,7 +32,8 @@ pip install Pillow numpy gspread imutils opencv-python zbar-py oauth2client
 
 ***
 
-##Setup
+## Setup
+
 1. Setup a worksheet with 3 spreadsheets in google spreadsheet
 > your first 2 spreadsheets should resemble with row 4 acting as a divider
 >
@@ -74,4 +75,4 @@ pip install Pillow numpy gspread imutils opencv-python zbar-py oauth2client
 > To run in terminal, open the terminal and `cd` into your folder
 > then run the code using `python main.py` or `python3 main.py` if you have python 2 installed
 
-![](2643 2017 Logo.png)
+![](2643_2017_Logo.png)
