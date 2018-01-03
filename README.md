@@ -59,9 +59,9 @@ pip install Pillow numpy gspread imutils opencv-python zbar-py oauth2client
 >```python
 >42 	self.read = readBarcode()
 >43 	self.results = ""
->44		self.s = spreadsheet("YOUR FILE NAME HERE") #place worksheet title here
+>44	self.s = spreadsheet("YOUR FILE NAME HERE") #place worksheet title here
 >45
->46		self.stopEvent= threading.Event()
+>46	self.stopEvent= threading.Event()
 >```
 6. If you already have a camera on the pi or any other device and don't want to use that camera, then change `cap = cv2.VideoCapture(0)` on line 151 to `1` or any other number instead of `0` (built or first camera plugged in)
 > ```python
