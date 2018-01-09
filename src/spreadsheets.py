@@ -35,33 +35,42 @@ class spreadsheet:
         # print(findDate.col)
         self.col = findDate.col
     
-    def addTotalTime(self, row, col):
+    def addTotalTime(self):
         listC = len(self.isheet.row_values(1))
         val = 0
         totalH = datetime.strptime('00:00:00', '%H:%M:%S').time()
         #print("[INFO] " + str(col))
- 
-        addVal = self.asheet.cell(row, 5).value
-        returnVal = None
 
-        for c in range(5, col+1):
-            #print("[INFO] " + str(c))
-            inVal = self.isheet.cell(row, c).value
-            outVal = self.osheet.cell(row, c).value
+        self.findDay()
+        cVal = self.isheet.cell(1, 1).value
+        totalIDs = 0
 
-            enterT = datetime.strptime(inVal, '%H:%M:%S').time()
-            exitT = datetime.strptime(outVal, '%H:%M:%S').time()
-            #print("[INFO] Enter: " + str(enterT) + "     [INFO] Exit: " + str(exitT))
+        while(cVal != ""):
+            totalIDs = totalIDs+1
+            cVal = self.isheet.cell(totalIDs, 1).value
+            print("[INFO] " + str(totalIDs))
+        
+        for r in range(2, totalIDs):
+            returnVal = None
+
+            for c in range(5, self.col+1):
+                inVal = self.isheet.cell(r, c).value
+                outVal = self.osheet.cell(r, c).value
+
+                if inVal != "":
+                    enterT = datetime.strptime(inVal, '%H:%M:%S').time()
+                    exitT = datetime.strptime(outVal, '%H:%M:%S').time()
+                    #print("[INFO] Enter: " + str(enterT) + "     [INFO] Exit: " + str(exitT))
             
-            dif = datetime.combine(datetime.today(), exitT) - datetime.combine(datetime.today(), enterT)
-            #print("[INFO] " + str(dif))
-            if c != 5:
-                totalH = totalH + dif
-            else:
-                totalH = datetime.combine(datetime.today(), totalH) + dif
+                    dif = datetime.combine(datetime.today(), exitT) - datetime.combine(datetime.today(), enterT)
+                    #print("[INFO] " + str(dif))
+                    if c != 5:
+                        totalH = totalH + dif
+                    else:
+                        totalH = datetime.combine(datetime.today(), totalH) + dif
             returnVal = str(totalH.hour) + ":" + str(totalH.minute) + ":" + str(totalH.second)
-        #print("[INFO] " + returnVal)
-        self.asheet.update_cell(row, 5, returnVal)
+            print("[INFO] Completed 1 with " + returnVal)
+            self.asheet.update_cell(r, 5, returnVal)
     
     # ##adds time stamp to sign in/out
     def addTimeStamp(self, row, col):
@@ -70,7 +79,7 @@ class spreadsheet:
         ts = str(tt.hour) + ":" + str(tt.minute) + ":" + str(tt.second)
         if val != "":
             self.osheet.update_cell(row, col, ts)
-            self.addTotalTime(row, col)
+            #self.addTotalTime(row, col) //NEED TO MAKE FASTER
             return "Good bye "  
         else:
             self.isheet.update_cell(row, col, ts)
